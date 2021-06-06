@@ -1,0 +1,40 @@
+---
+# Edition can be one of: 'ce' (Community Edition) or 'ee' (Enterprise Edition).
+# You can control whether the package is installed, uninstalled, or at the latest version by setting `docker_package_state` to 
+# `present`, `absent`, or `latest`, respectively.
+docker_edition: 'ce'
+docker_package: "docker-{{ docker_edition }}"
+docker_package_state: present
+
+# Service options.
+# Docker daemon will be automatically restarted if the Docker package is updated.
+docker_service_state: started
+docker_service_enabled: true
+docker_restart_handler_state: restarted
+
+# Docker Compose options.
+# Variables to control the state of the `docker` service, and whether it should start on boot. 
+# If you're installing Docker inside a Docker container without systemd or sysvinit, 
+# you should set these to `stopped` and set the enabled variable to `no`.
+docker_install_compose: true
+docker_compose_version: "1.26.0"
+docker_compose_url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
+docker_compose_path: /usr/local/bin/docker-compose
+
+# Used only for Debian/Ubuntu.
+docker_repo_url: https://download.docker.com/linux
+docker_apt_release_channel: stable
+docker_apt_arch: amd64
+docker_apt_repository: "deb [arch={{ docker_apt_arch }}] {{ docker_repo_url }}/{{ ansible_distribution | lower }} {{ ansible_distribution_release }} {{ docker_apt_release_channel }}"
+docker_apt_ignore_key_error: true
+docker_apt_gpg_key: "{{ docker_repo_url }}/{{ ansible_distribution | lower }}/gpg"
+
+# Used only for RedHat/CentOS/Fedora.
+docker_yum_repo_url: "{{ docker_repo_url }}/{{ (ansible_distribution == 'Fedora') | ternary('fedora','centos') }}/docker-{{ docker_edition }}.repo"
+docker_yum_repo_enable_nightly: '0'
+docker_yum_repo_enable_test: '0'
+docker_yum_gpg_key: "{{ docker_repo_url }}/centos/gpg"
+
+# A list of users who will be added to the docker group.
+# Define the users accordingly
+docker_users: []
